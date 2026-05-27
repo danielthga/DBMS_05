@@ -51,7 +51,8 @@ git --version
 > **Screenshot 1:** Take a screenshot of your terminal showing both
 > successful version checks and insert it here.
 >
-> `[insert screenshot]`
+> <img width="1473" height="114" alt="grafik" src="https://github.com/user-attachments/assets/4eb36499-2304-48b8-983f-c8ae40e75f5a" />
+
 
 ---
 
@@ -110,22 +111,22 @@ for each temporal attribute.
 
 | Attribute              | Your Type         | Justification |
 |------------------------|-------------------|---------------|
-| isbn                   |                   |               |
-| titel                  |                   |               |
-| erscheinungsjahr       |                   |               |
-| verlag                 |                   |               |
-| tagesgebuehr           |                   |               |
-| exemplar_id            |                   |               |
-| standort               |                   |               |
-| mitglied_id            |                   |               |
-| nachname               |                   |               |
-| vorname                |                   |               |
-| geburtsdatum           |                   |               |
-| email                  |                   |               |
-| beitritt_datum         |                   |               |
-| ausleihe_id            |                   |               |
-| ausleihe_datum         |                   |               |
-| rueckgabe_datum        |                   |               |
+| isbn                   | varchar           | to display "-" for a better readability and also leading zeros wont be lost       |
+| titel                  | varchar           | its a text with an unknown length                                                 |
+| erscheinungsjahr       | date              | we only need the day not the time                                                 |
+| verlag                 | varchar           | its a text with an unknown length                                                 |
+| tagesgebuehr           | numeric(p,s)      | accurate for money, no roundings                                                  |
+| exemplar_id            | bigint            | maybe we will have more the 2,1 million books, so we need more than int           |
+| standort               | varchar           | cityname or adress -> text                                                        |
+| mitglied_id            | bigint            | maybe we will have more then 2,1 million members                                  |
+| nachname               | varchar           | text                                                                              |
+| vorname                | varchar           | text                                                                              |
+| geburtsdatum           | date              | date without time                                                                 |
+| email                  | varchar           | email address->text                                                               |
+| beitritt_datum         | date              | date without time                                                                 |
+| ausleihe_id            | bigint            | maybe we will have more then 2,1 lendings                                         |
+| ausleihe_datum         | timestamp         | we need the exact time but we dont need a timezone because the library is local   |
+| rueckgabe_datum        | timestamp         | see ausleihe_datum                                                                |
 
 ### Questions for Task 1
 
@@ -133,19 +134,19 @@ for each temporal attribute.
 example — using arithmetic — of why `REAL` would produce an incorrect result
 for a lending fee calculation. Which type must be used instead?
 
-> *Your answer:*
+> If we store the value 0.2 as a real it is stored as 0.20000000298023223876953125. If we now use this value a lot of calculations we will produce or loose money which is not there. 
 
 **Question 1.2:** `rueckgabe_datum` must be nullable. Explain what `NULL` means
 in this specific context. Is `NULL` the same as "zero days"? Justify with
 reference to the three-valued logic of SQL.
 
-> *Your answer:*
+> NULL will display that we dont have a rueckgabe_datum it will not be the same as zero days, because zero days could mean the there is no time left. Like in the three-valued logic where we not only have the true or false, but also NULL.
 
 **Question 1.3:** `beitritt_datum` should default to today's date when no value
 is provided. Write the `DEFAULT` expression you would use and explain why this
 is preferable to always supplying the date explicitly in the application.
 
-> *Your answer:*
+> NOT NULL DEFAULT CURRENT_DATE - Most of the times when we create a new user, its done directly when the user joins and not 2 days later. So in most cases we dont need to specify the beitritt_datum.
 
 ---
 
