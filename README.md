@@ -124,7 +124,7 @@ for each temporal attribute.
 | geburtsdatum           | date              | date without time                                                                 |
 | email                  | varchar           | email address->text                                                               |
 | beitritt_datum         | date              | date without time                                                                 |
-| ausleihe_id            | bigint            | maybe we will have more then 2,1 lendings                                         |
+| ausleihe_id            | bigint            | maybe we will have more then 2,1 million lendings                                         |
 | ausleihe_datum         | timestamp         | we need the exact time but we dont need a timezone because the library is local   |
 | rueckgabe_datum        | timestamp         | see ausleihe_datum                                                                |
 
@@ -243,7 +243,8 @@ sqlite3 bibliothek.db ".schema"
 > **Screenshot 2:** Take a screenshot showing the `.tables` and `.schema`
 > output in your terminal.
 >
-> `[insert screenshot]`
+> <img width="1164" height="1044" alt="grafik" src="https://github.com/user-attachments/assets/1e157003-8f48-4581-9e40-93f59d322b8d" />
+
 
 ### Task 2c – Test Constraints
 
@@ -269,9 +270,9 @@ INSERT INTO ausleihe VALUES (1, 1, 1, '2026-05-10', '2026-05-01');
 
 > *Describe the error or result for each test:*
 >
-> - Test A:
-> - Test B:
-> - Test C:
+> - Test A: We couldnt add a book because its fee was negative
+> - Test B: We couldnt add a user without an emailadress
+> - Test C: We couldnt add the lending because the return date was earlier then the loan date.
 
 ### Questions for Task 2
 
@@ -279,19 +280,19 @@ INSERT INTO ausleihe VALUES (1, 1, 1, '2026-05-10', '2026-05-01');
 constraint rather than a column constraint. Why is a column constraint
 insufficient here?
 
-> *Your answer:*
+> The table constraint can check multiply itemns, the column constrain can only check one.
 
 **Question 2.2:** You chose `ON DELETE RESTRICT` for all foreign keys.
 Describe a realistic alternative: for which relationship would `ON DELETE
 CASCADE` be appropriate instead, and why?
 
-> *Your answer:*
+> Like in our script, when you have a student which deregisters you can delete his exam because you want need to correct it.
 
 **Question 2.3:** `email` is declared `UNIQUE`. According to the SQL standard,
 how many `NULL` values may a `UNIQUE` column contain? Explain using the
 three-valued logic of SQL.
 
-> *Your answer:*
+> Because NULL is a value there can only be one item with a NULL
 
 ---
 
