@@ -243,7 +243,8 @@ sqlite3 bibliothek.db ".schema"
 > **Screenshot 2:** Take a screenshot showing the `.tables` and `.schema`
 > output in your terminal.
 >
-> <img width="1164" height="1044" alt="grafik" src="https://github.com/user-attachments/assets/1e157003-8f48-4581-9e40-93f59d322b8d" />
+><img width="1126" height="1039" alt="grafik" src="https://github.com/user-attachments/assets/43312d4c-7151-4b12-a407-2bbf13b4e04c" />
+
 
 
 ### Task 2c – Test Constraints
@@ -410,21 +411,21 @@ works because all affected rows are in the same table. Why can a standard SQL
 `UPDATE` not update rows in two different tables simultaneously, and what would
 you use instead in a production system?
 
-> *Your answer:*
+> It will only update on table at a time so consistency and conflict handling is not to complex.
 
 **Question 3.2:** Task 3b.3 raises the fee for books published before 1960
 by 10 cents. Write the equivalent statement using `NUMERIC` arithmetic:
 `tagesgebuehr = tagesgebuehr + 0.10`. Would the same statement work correctly
 with `REAL`? Explain the risk.
 
-> *Your answer:*
+> It will work with real but we would have some rounding problems,so we would delete or produce money which isnt there.
 
 **Question 3.3:** Task 3c.1 deletes loans where the return date is more than
 30 days ago. A `DELETE` without a `WHERE` clause would delete all loans.
 Describe the operational consequence and explain how `BEGIN` / `ROLLBACK`
 protects against this mistake.
 
-> *Your answer:*
+> With begin and rollback you can check your delete commands, only if everything works fine you will commit them.
 
 ---
 
@@ -485,14 +486,14 @@ ALTER TABLE exemplar
 nullable column. Why is this simpler than adding a `NOT NULL` column to an
 already-populated table? What steps would be needed for a `NOT NULL` column?
 
-> *Your answer:*
+> If we want to set it not null we would have to make sure that every entry has a number in it.
 
 **Question 4.2:** SQLite's limited `ALTER TABLE` support is a deliberate
 design decision. What does this tell you about the trade-off between a
 lightweight embedded database and a full-featured server database system?
 Name one scenario where SQLite is the right choice and one where it is not.
 
-> *Your answer:*
+> It is the right choice if you want to have a small database which is lightweight and fast setup. But if you have a alot of data and want handle this data over a long time and change the schema you will better use a server database.
 
 Commit:
 
@@ -546,7 +547,8 @@ SELECT * FROM ausleihe WHERE ausleihe_id = 5;
 
 > **Screenshot 3:** Take a screenshot showing the inserted row.
 >
-> `[insert screenshot]`
+> <img width="949" height="199" alt="grafik" src="https://github.com/user-attachments/assets/41e2ce7f-0ecd-4880-957d-ab5e729da4cc" />
+
 
 ### Task 5b – Simulate a Rollback
 
