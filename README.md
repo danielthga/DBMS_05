@@ -581,20 +581,20 @@ SELECT COUNT(*) FROM ausleihe WHERE ausleihe_id = 6;
 availability check and the insert happen inside the same transaction?
 What could go wrong if they ran as separate Autocommit statements?
 
-> *Your answer:*
+> You have to be sure that nothing in between this two commands happens and not another person lends the book.
 
 **Question 5.2:** The lecture states: "Ein fehlendes `WHERE` aktualisiert
 alle Zeilen." Write the single most dangerous `UPDATE` statement possible
 on this database and explain the damage it would cause. Then explain how
 `BEGIN` / `ROLLBACK` would allow you to recover.
 
-> *Your answer:*
+> DELETE * FROM * would maybe be the worst statement, with the begin and rollback you can test the result and then only commit if everything works out.
 
 **Question 5.3:** Autocommit is convenient for read-only queries (`SELECT`).
 Is it also safe for DML in an interactive session? Give a concrete example
 from this exercise where Autocommit would have caused irreversible data loss.
 
-> *Your answer:*
+> No it is not safe like we said befor you could delete all you data.
 
 Commit:
 
@@ -613,7 +613,7 @@ The lecture warns against using `TEXT` for everything. Looking at the
 it should be a more specific type, and what concrete query would break or
 produce wrong results if the wrong type were used?
 
-> *Your answer:*
+> Erscheinungsjahr would be not good if we have it as a text because we can not calculate or compare it with other dates.
 
 **Question B – DDL as documentation:**  
 A colleague reads your `schema.sql` and says: "Constraints slow down inserts
@@ -621,14 +621,14 @@ A colleague reads your `schema.sql` and says: "Constraints slow down inserts
 reasons why enforcing constraints in the database is preferable to
 enforcing them only in application code.
 
-> *Your answer:*
+> First if we access the database directly via the terminal (like we did today!), application rules can't protect the data. Second, if multiple apps connect to the same database, putting the rules in the database ensures they are always enforced without having to rewrite the same checks in every app's code.
 
 **Question C – NULL semantics in lending:**  
 In `ausleihe`, `rueckgabe_datum IS NULL` means "currently on loan". Could
 this semantic be expressed without using `NULL` — e.g. by using a status
 column instead? What are the trade-offs?
 
-> *Your answer:*
+> We could add another column for this but it wont make sense, because it gives us more redundancy because NULL shows us that it is on loan.
 
 **Question D – `TRUNCATE` vs. `DELETE`:**  
 If you wanted to reset the entire database and reload the sample data from
@@ -636,14 +636,16 @@ scratch, you would need to empty all four tables. Can you use `TRUNCATE`
 in SQLite? What alternative would you use, and in what order must the tables
 be emptied to respect foreign key constraints?
 
-> *Your answer:*
+> No, SQLite does not support the TRUNCATE command. Instead, we have to use DELETE FROM table_name; To avoid foreign key errors, we must empty the child tables first, then the parents: ausleihe first, then exemplar, and finally buch and mitglied.
 
 > **Screenshot 4:** Take a screenshot showing the output of the row-count
 > verification from Task 3a after completing all DML tasks, with
 > `.headers on` and `.mode column` active.
 >
-> `[insert screenshot]`
+> <img width="855" height="457" alt="grafik" src="https://github.com/user-attachments/assets/6628fde9-1dfc-4a68-8ee4-1c285a6e3101" />
 
+
+It took me 4h to finish this, but i learned a lot and could finish almost everthing on my own with the script.
 ---
 
 ## Bonus Tasks
