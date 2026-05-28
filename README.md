@@ -51,7 +51,8 @@ git --version
 > **Screenshot 1:** Take a screenshot of your terminal showing both
 > successful version checks and insert it here.
 >
-> `[insert screenshot]`
+> <img width="1473" height="114" alt="grafik" src="https://github.com/user-attachments/assets/4eb36499-2304-48b8-983f-c8ae40e75f5a" />
+
 
 ---
 
@@ -110,22 +111,22 @@ for each temporal attribute.
 
 | Attribute              | Your Type         | Justification |
 |------------------------|-------------------|---------------|
-| isbn                   |                   |               |
-| titel                  |                   |               |
-| erscheinungsjahr       |                   |               |
-| verlag                 |                   |               |
-| tagesgebuehr           |                   |               |
-| exemplar_id            |                   |               |
-| standort               |                   |               |
-| mitglied_id            |                   |               |
-| nachname               |                   |               |
-| vorname                |                   |               |
-| geburtsdatum           |                   |               |
-| email                  |                   |               |
-| beitritt_datum         |                   |               |
-| ausleihe_id            |                   |               |
-| ausleihe_datum         |                   |               |
-| rueckgabe_datum        |                   |               |
+| isbn                   | varchar           | to display "-" for a better readability and also leading zeros wont be lost       |
+| titel                  | varchar           | its a text with an unknown length                                                 |
+| erscheinungsjahr       | date              | we only need the day not the time                                                 |
+| verlag                 | varchar           | its a text with an unknown length                                                 |
+| tagesgebuehr           | numeric(p,s)      | accurate for money, no roundings                                                  |
+| exemplar_id            | bigint            | maybe we will have more the 2,1 million books, so we need more than int           |
+| standort               | varchar           | cityname or adress -> text                                                        |
+| mitglied_id            | bigint            | maybe we will have more then 2,1 million members                                  |
+| nachname               | varchar           | text                                                                              |
+| vorname                | varchar           | text                                                                              |
+| geburtsdatum           | date              | date without time                                                                 |
+| email                  | varchar           | email address->text                                                               |
+| beitritt_datum         | date              | date without time                                                                 |
+| ausleihe_id            | bigint            | maybe we will have more then 2,1 million lendings                                         |
+| ausleihe_datum         | timestamp         | we need the exact time but we dont need a timezone because the library is local   |
+| rueckgabe_datum        | timestamp         | see ausleihe_datum                                                                |
 
 ### Questions for Task 1
 
@@ -133,19 +134,19 @@ for each temporal attribute.
 example — using arithmetic — of why `REAL` would produce an incorrect result
 for a lending fee calculation. Which type must be used instead?
 
-> *Your answer:*
+> If we store the value 0.2 as a real it is stored as 0.20000000298023223876953125. If we now use this value a lot of calculations we will produce or loose money which is not there. 
 
 **Question 1.2:** `rueckgabe_datum` must be nullable. Explain what `NULL` means
 in this specific context. Is `NULL` the same as "zero days"? Justify with
 reference to the three-valued logic of SQL.
 
-> *Your answer:*
+> NULL will display that we dont have a rueckgabe_datum it will not be the same as zero days, because zero days could mean the there is no time left. Like in the three-valued logic where we not only have the true or false, but also NULL.
 
 **Question 1.3:** `beitritt_datum` should default to today's date when no value
 is provided. Write the `DEFAULT` expression you would use and explain why this
 is preferable to always supplying the date explicitly in the application.
 
-> *Your answer:*
+> NOT NULL DEFAULT CURRENT_DATE - Most of the times when we create a new user, its done directly when the user joins and not 2 days later. So in most cases we dont need to specify the beitritt_datum.
 
 ---
 
@@ -242,7 +243,9 @@ sqlite3 bibliothek.db ".schema"
 > **Screenshot 2:** Take a screenshot showing the `.tables` and `.schema`
 > output in your terminal.
 >
-> `[insert screenshot]`
+><img width="1126" height="1039" alt="grafik" src="https://github.com/user-attachments/assets/43312d4c-7151-4b12-a407-2bbf13b4e04c" />
+
+
 
 ### Task 2c – Test Constraints
 
@@ -268,9 +271,9 @@ INSERT INTO ausleihe VALUES (1, 1, 1, '2026-05-10', '2026-05-01');
 
 > *Describe the error or result for each test:*
 >
-> - Test A:
-> - Test B:
-> - Test C:
+> - Test A: We couldnt add a book because its fee was negative
+> - Test B: We couldnt add a user without an emailadress
+> - Test C: We couldnt add the lending because the return date was earlier then the loan date.
 
 ### Questions for Task 2
 
@@ -278,19 +281,19 @@ INSERT INTO ausleihe VALUES (1, 1, 1, '2026-05-10', '2026-05-01');
 constraint rather than a column constraint. Why is a column constraint
 insufficient here?
 
-> *Your answer:*
+> The table constraint can check multiply itemns, the column constrain can only check one.
 
 **Question 2.2:** You chose `ON DELETE RESTRICT` for all foreign keys.
 Describe a realistic alternative: for which relationship would `ON DELETE
 CASCADE` be appropriate instead, and why?
 
-> *Your answer:*
+> Like in our script, when you have a student which deregisters you can delete his exam because you want need to correct it.
 
 **Question 2.3:** `email` is declared `UNIQUE`. According to the SQL standard,
 how many `NULL` values may a `UNIQUE` column contain? Explain using the
 three-valued logic of SQL.
 
-> *Your answer:*
+> Because NULL is a value there can only be one item with a NULL
 
 ---
 
@@ -408,21 +411,21 @@ works because all affected rows are in the same table. Why can a standard SQL
 `UPDATE` not update rows in two different tables simultaneously, and what would
 you use instead in a production system?
 
-> *Your answer:*
+> It will only update on table at a time so consistency and conflict handling is not to complex.
 
 **Question 3.2:** Task 3b.3 raises the fee for books published before 1960
 by 10 cents. Write the equivalent statement using `NUMERIC` arithmetic:
 `tagesgebuehr = tagesgebuehr + 0.10`. Would the same statement work correctly
 with `REAL`? Explain the risk.
 
-> *Your answer:*
+> It will work with real but we would have some rounding problems,so we would delete or produce money which isnt there.
 
 **Question 3.3:** Task 3c.1 deletes loans where the return date is more than
 30 days ago. A `DELETE` without a `WHERE` clause would delete all loans.
 Describe the operational consequence and explain how `BEGIN` / `ROLLBACK`
 protects against this mistake.
 
-> *Your answer:*
+> With begin and rollback you can check your delete commands, only if everything works fine you will commit them.
 
 ---
 
@@ -483,14 +486,14 @@ ALTER TABLE exemplar
 nullable column. Why is this simpler than adding a `NOT NULL` column to an
 already-populated table? What steps would be needed for a `NOT NULL` column?
 
-> *Your answer:*
+> If we want to set it not null we would have to make sure that every entry has a number in it.
 
 **Question 4.2:** SQLite's limited `ALTER TABLE` support is a deliberate
 design decision. What does this tell you about the trade-off between a
 lightweight embedded database and a full-featured server database system?
 Name one scenario where SQLite is the right choice and one where it is not.
 
-> *Your answer:*
+> It is the right choice if you want to have a small database which is lightweight and fast setup. But if you have a alot of data and want handle this data over a long time and change the schema you will better use a server database.
 
 Commit:
 
@@ -544,7 +547,8 @@ SELECT * FROM ausleihe WHERE ausleihe_id = 5;
 
 > **Screenshot 3:** Take a screenshot showing the inserted row.
 >
-> `[insert screenshot]`
+> <img width="949" height="199" alt="grafik" src="https://github.com/user-attachments/assets/41e2ce7f-0ecd-4880-957d-ab5e729da4cc" />
+
 
 ### Task 5b – Simulate a Rollback
 
@@ -577,20 +581,20 @@ SELECT COUNT(*) FROM ausleihe WHERE ausleihe_id = 6;
 availability check and the insert happen inside the same transaction?
 What could go wrong if they ran as separate Autocommit statements?
 
-> *Your answer:*
+> You have to be sure that nothing in between this two commands happens and not another person lends the book.
 
 **Question 5.2:** The lecture states: "Ein fehlendes `WHERE` aktualisiert
 alle Zeilen." Write the single most dangerous `UPDATE` statement possible
 on this database and explain the damage it would cause. Then explain how
 `BEGIN` / `ROLLBACK` would allow you to recover.
 
-> *Your answer:*
+> DELETE * FROM * would maybe be the worst statement, with the begin and rollback you can test the result and then only commit if everything works out.
 
 **Question 5.3:** Autocommit is convenient for read-only queries (`SELECT`).
 Is it also safe for DML in an interactive session? Give a concrete example
 from this exercise where Autocommit would have caused irreversible data loss.
 
-> *Your answer:*
+> No it is not safe like we said befor you could delete all you data.
 
 Commit:
 
@@ -609,7 +613,7 @@ The lecture warns against using `TEXT` for everything. Looking at the
 it should be a more specific type, and what concrete query would break or
 produce wrong results if the wrong type were used?
 
-> *Your answer:*
+> Erscheinungsjahr would be not good if we have it as a text because we can not calculate or compare it with other dates.
 
 **Question B – DDL as documentation:**  
 A colleague reads your `schema.sql` and says: "Constraints slow down inserts
@@ -617,14 +621,14 @@ A colleague reads your `schema.sql` and says: "Constraints slow down inserts
 reasons why enforcing constraints in the database is preferable to
 enforcing them only in application code.
 
-> *Your answer:*
+> First if we access the database directly via the terminal (like we did today!), application rules can't protect the data. Second, if multiple apps connect to the same database, putting the rules in the database ensures they are always enforced without having to rewrite the same checks in every app's code.
 
 **Question C – NULL semantics in lending:**  
 In `ausleihe`, `rueckgabe_datum IS NULL` means "currently on loan". Could
 this semantic be expressed without using `NULL` — e.g. by using a status
 column instead? What are the trade-offs?
 
-> *Your answer:*
+> We could add another column for this but it wont make sense, because it gives us more redundancy because NULL shows us that it is on loan.
 
 **Question D – `TRUNCATE` vs. `DELETE`:**  
 If you wanted to reset the entire database and reload the sample data from
@@ -632,14 +636,16 @@ scratch, you would need to empty all four tables. Can you use `TRUNCATE`
 in SQLite? What alternative would you use, and in what order must the tables
 be emptied to respect foreign key constraints?
 
-> *Your answer:*
+> No, SQLite does not support the TRUNCATE command. Instead, we have to use DELETE FROM table_name; To avoid foreign key errors, we must empty the child tables first, then the parents: ausleihe first, then exemplar, and finally buch and mitglied.
 
 > **Screenshot 4:** Take a screenshot showing the output of the row-count
 > verification from Task 3a after completing all DML tasks, with
 > `.headers on` and `.mode column` active.
 >
-> `[insert screenshot]`
+> <img width="855" height="457" alt="grafik" src="https://github.com/user-attachments/assets/6628fde9-1dfc-4a68-8ee4-1c285a6e3101" />
 
+
+It took me 4h to finish this, but i learned a lot and could finish almost everthing on my own with the script.
 ---
 
 ## Bonus Tasks
